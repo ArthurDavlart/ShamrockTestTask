@@ -5,7 +5,9 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Sms {
@@ -21,13 +23,12 @@ public class Sms {
     private String message;
 
     @Column(nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date sendingTime;
+    private Date sendingTime = new Date();
 
     @ManyToMany
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet();
 
     public Sms() {
-        this.sendingTime = new Date();
     }
 
     public Long getId() {
@@ -68,5 +69,11 @@ public class Sms {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Set<String> getTagNames(){
+        return this.tags
+                .stream()
+                .map(tag -> tag.getName()).collect(Collectors.toSet());
     }
 }

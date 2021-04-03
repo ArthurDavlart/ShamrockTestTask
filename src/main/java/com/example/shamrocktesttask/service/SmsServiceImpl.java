@@ -25,7 +25,7 @@ public class SmsServiceImpl implements SmsService {
     public Sms send(Sms sms) {
         Set<Tag> dbTags = getDbTags(sms.getTags());
 
-        // dbTags.forEach(tag -> tag.getSmses().add(sms));
+        dbTags.forEach(tag -> tag.getSmses().add(sms));
 
         sms.setTags(dbTags);
 
@@ -47,7 +47,7 @@ public class SmsServiceImpl implements SmsService {
             Set<Tag> dbTags = new HashSet();
             sms.getTags().forEach(tag -> {
                 Tag dbTag = dbTagsMap.get(tag.getName());
-                //dbTag.getSmses().add(sms);
+                dbTag.getSmses().add(sms);
                 dbTags.add(dbTag);
             });
             sms.setTags(dbTags);
@@ -118,17 +118,19 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public Set<Sms> getSmsesBy(Set<String> tags) {
-        return smsRepository.findAllByTagsIn(tagRepository.findTagsByNames(tags));
+    public List<Sms> getSmsesBy(Set<String> tags) {
+        return smsRepository.findAllByTagsIn(tagRepository.findTagsByNames(tags)).stream().collect(Collectors.toList());
     }
 
     @Override
-    public Set<Sms> getSmsesBy(Date date) {
-        return null;
+    public List<Sms>getSmsesBy(String phone) {
+        return smsRepository.findAllByPhone(phone)
+                .stream().collect(Collectors.toList());
     }
 
     @Override
-    public Set<Sms>getSmsesBy(String phone) {
-        return null;
+    public List<Sms> getSmsesBy(Date start, Date finish) {
+        return smsRepository.findAllBySendingTimeBetween(start, finish)
+                .stream().collect(Collectors.toList());
     }
 }

@@ -10,7 +10,7 @@ import java.util.Set;
 public interface SmsService {
     Sms send(Sms sms);
     List<Sms> send(List<Sms> smses);
-    Set<Sms> getSmsesBy(Date date);
-    Set<Sms> getSmsesBy(String phone);
-    Set<Sms> getSmsesBy(Set<String> tags);
+    List<Sms> getSmsesBy(Date start, Date finish);
+    List<Sms> getSmsesBy(String phone);
+    List<Sms> getSmsesBy(Set<String> tags);
 }

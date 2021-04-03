@@ -1,6 +1,7 @@
 package com.example.shamrocktesttask.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -13,7 +14,7 @@ public class Tag {
     private String name;
 
     @ManyToMany
-    private Set<Sms> smses;
+    private Set<Sms> smses = new HashSet();
 
     public Tag() {
 
@@ -46,4 +47,5 @@ public class Tag {
     public void setSmses(Set<Sms> smses) {
         this.smses = smses;
     }
+
 }
