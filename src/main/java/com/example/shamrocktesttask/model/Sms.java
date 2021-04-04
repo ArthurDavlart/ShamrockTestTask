@@ -23,7 +23,7 @@ public class Sms {
     private String message;
 
     @Column(nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date sendingTime = new Date();
+    private Date sendingTime;
 
     @ManyToMany
     private Set<Tag> tags = new HashSet();

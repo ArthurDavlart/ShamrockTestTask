@@ -15,14 +15,20 @@ import java.util.stream.Collectors;
 public class SmsServiceImpl implements SmsService {
     private final SmsRepository smsRepository;
     private final TagRepository tagRepository;
+    private final SmsSender smsSender;
 
-    public SmsServiceImpl(SmsRepository smsRepository, TagRepository tagRepository){
+    public SmsServiceImpl(SmsRepository smsRepository, TagRepository tagRepository, SmsSender smsSender){
         this.smsRepository = smsRepository;
         this.tagRepository = tagRepository;
+        this.smsSender = smsSender;
     }
 
     @Override
     public Sms send(Sms sms) {
+        Date sendingTime = smsSender.sendMessage(sms.getPhone(), sms.getMessage());
+
+        sms.setSendingTime(sendingTime);
+
         Set<Tag> dbTags = getDbTags(sms.getTags());
 
         dbTags.forEach(tag -> tag.getSmses().add(sms));
@@ -34,6 +40,12 @@ public class SmsServiceImpl implements SmsService {
 
     @Override
     public List<Sms> send(List<Sms> smses) {
+        smses.forEach(sms -> {
+            Date sendingTime = smsSender.sendMessage(sms.getPhone(), sms.getMessage());
+
+            sms.setSendingTime(sendingTime);
+        });
+
         Set<String> allSendingTagNames = getTags(smses);
         HashMap<String, Tag> dbTagsMap = convertToDbTagsMap(allSendingTagNames);
 
