@@ -114,7 +114,7 @@ public class SmsServiceImpl implements SmsService {
     }
 
     private Set<Tag> getExistTags(Set<String> tags){
-        return tagRepository.findTagsByNames(tags);
+        return tagRepository.findAllByNameIn(tags);
     }
 
     private Set<String> getNotExistTagNames(Set<String> workTagNames, Set<String> existTagNames){
@@ -131,7 +131,7 @@ public class SmsServiceImpl implements SmsService {
 
     @Override
     public List<Sms> getSmsesBy(Set<String> tags) {
-        return smsRepository.findAllByTagsIn(tagRepository.findTagsByNames(tags)).stream().collect(Collectors.toList());
+        return smsRepository.findAllByTagsIn(tagRepository.findAllByNameIn(tags)).stream().collect(Collectors.toList());
     }
 
     @Override
