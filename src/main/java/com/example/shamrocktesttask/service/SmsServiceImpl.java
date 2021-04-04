@@ -135,6 +135,16 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
+    public Sms getSmsById(Long id) {
+        return smsRepository.findById(id).get();
+    }
+
+    @Override
+    public List<Sms> getSmsesBy(List<Long> ids) {
+        return smsRepository.findAllById(ids);
+    }
+
+    @Override
     public List<Sms>getSmsesBy(String phone) {
         return smsRepository.findAllByPhone(phone)
                 .stream().collect(Collectors.toList());

@@ -3,17 +3,21 @@ package com.example.shamrocktesttask.controller;
 import com.example.shamrocktesttask.dto.IntervalDto;
 import com.example.shamrocktesttask.dto.SmsDto;
 import com.example.shamrocktesttask.model.Sms;
-import com.example.shamrocktesttask.model.Tag;
 import com.example.shamrocktesttask.service.SmsService;
 import com.example.shamrocktesttask.utils.Convertor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class SmsController {
@@ -26,45 +30,94 @@ public class SmsController {
     }
 
     @PostMapping("/sms")
-    SmsDto send(@RequestBody SmsDto smsDto){
+    ResponseEntity<?> send(@RequestBody SmsDto smsDto){
         Sms sms = convertor.convertToSms(smsDto);
-        return convertor.convertToSmsDto(smsService.send(sms));
+        SmsDto smsDtoResult = convertor.convertToSmsDto(smsService.send(sms));
+
+        EntityModel<SmsDto> entityModel = toModel(smsDtoResult);
+
+        return  ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
     }
 
     @PostMapping("/smses")
-    List<SmsDto> send(@RequestBody List<SmsDto> smsDtos){
+    ResponseEntity<?> send(@RequestBody List<SmsDto> smsDtos){
         List<Sms> smses = smsDtos
                 .stream()
                 .map(smsDto -> convertor.convertToSms(smsDto))
                 .collect(Collectors.toList());
 
-        return smsService.send(smses)
+        List<Sms> smsesResult = smsService.send(smses);
+
+        List<Long> ids = smsesResult
                 .stream()
-                .map(sms -> convertor.convertToSmsDto(sms)).collect(Collectors.toList());
+                .map(Sms:: getId)
+                .collect(Collectors.toList());
+
+        List<EntityModel<SmsDto>> smsDtoResult = smsesResult
+                .stream()
+                .map(sms -> toModel(convertor.convertToSmsDto(sms)))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<SmsDto>> entityModels =  CollectionModel.of(smsDtoResult,
+                linkTo(methodOn(SmsController.class).getSmsesByIds(ids)).withSelfRel());
+
+        return ResponseEntity
+                .created(entityModels.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(smsDtoResult);
+    }
+
+    @GetMapping("/sms/getById/{id}")
+    ResponseEntity<?> getSmsById(@PathVariable Long id){
+        SmsDto smsdto = convertor.convertToSmsDto(smsService.getSmsById(id));
+
+        EntityModel<SmsDto> smsDtoEntityModel = toModel(smsdto);
+
+        return ResponseEntity
+                .ok(smsDtoEntityModel);
+    }
+
+    @GetMapping("/smses/getIds")
+    ResponseEntity<?> getSmsesByIds(@RequestBody List<Long> ids){
+        List<EntityModel<SmsDto>> entityModels = smsService.getSmsesBy(ids)
+                .stream()
+                .map(sms -> toModel(convertor.convertToSmsDto(sms)))
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .ok(entityModels);
     }
 
     @GetMapping("/smses/getByTag")
-    List<SmsDto> getSmses(@RequestBody Set<String> tags){
-        return smsService.getSmsesBy(tags)
+    ResponseEntity<?> getSmses(@RequestBody Set<String> tags){
+        return ResponseEntity
+                .ok(smsService.getSmsesBy(tags)
                 .stream()
-                .map(sms -> convertor.convertToSmsDto(sms))
-                .collect(Collectors.toList());
+                .map(sms -> toModel(convertor.convertToSmsDto(sms)))
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/smses/getByPhone")
-    List<SmsDto> getSmses(@RequestBody String phone){
-        return smsService.getSmsesBy(phone)
-                .stream()
-                .map(sms -> convertor.convertToSmsDto(sms))
-                .collect(Collectors.toList());
+    ResponseEntity<?> getSmses(@RequestBody String phone){
+        return ResponseEntity
+                .ok(smsService.getSmsesBy(phone)
+                        .stream()
+                        .map(sms -> toModel(convertor.convertToSmsDto(sms)))
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping("/smses/getByTime")
-    List<SmsDto> getSmses(@RequestBody IntervalDto intervalDto){
-        return smsService.getSmsesBy(intervalDto.getStartDate(), intervalDto.getFinishDate())
-                .stream()
-                .map(sms -> convertor.convertToSmsDto(sms))
-                .collect(Collectors.toList());
+    ResponseEntity<?> getSmses(@RequestBody IntervalDto intervalDto){ 
+        return ResponseEntity
+                .ok(smsService.getSmsesBy(intervalDto.getStartDate(), intervalDto.getFinishDate())
+                        .stream()
+                        .map(sms -> toModel(convertor.convertToSmsDto(sms)))
+                        .collect(Collectors.toList()));
     }
 
+    private EntityModel<SmsDto> toModel(SmsDto smsDto){
+        return EntityModel.of(smsDto,
+                linkTo(methodOn(SmsController.class).getSmsById(smsDto.getId())).withSelfRel());
+    }
 }

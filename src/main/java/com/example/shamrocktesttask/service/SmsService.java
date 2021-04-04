@@ -13,4 +13,6 @@ public interface SmsService {
     List<Sms> getSmsesBy(Date start, Date finish);
     List<Sms> getSmsesBy(String phone);
     List<Sms> getSmsesBy(Set<String> tags);
+    Sms getSmsById(Long id);
+    List<Sms> getSmsesBy(List<Long> ids);
 }

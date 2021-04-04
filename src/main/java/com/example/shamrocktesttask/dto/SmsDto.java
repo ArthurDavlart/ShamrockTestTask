@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Set;
 
 public class SmsDto {
+    private Long id;
     private String message;
     private String phone;
     private Date sendingTime;
@@ -17,6 +18,14 @@ public class SmsDto {
         this.phone = phone;
         this.sendingTime = sendingTime;
         this.tags = tags;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMessage() {
