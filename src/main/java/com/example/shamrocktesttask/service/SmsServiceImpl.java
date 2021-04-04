@@ -130,7 +130,7 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public List<Sms> getSmsesBy(Set<String> tags) {
+    public List<Sms> getSmsesByTags(Set<String> tags) {
         return smsRepository.findAllByTagsIn(tagRepository.findAllByNameIn(tags)).stream().collect(Collectors.toList());
     }
 
@@ -140,18 +140,18 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public List<Sms> getSmsesBy(List<Long> ids) {
+    public List<Sms> getSmsesByIds(List<Long> ids) {
         return smsRepository.findAllById(ids);
     }
 
     @Override
-    public List<Sms>getSmsesBy(String phone) {
+    public List<Sms> getSmsesByPhone(String phone) {
         return smsRepository.findAllByPhone(phone)
                 .stream().collect(Collectors.toList());
     }
 
     @Override
-    public List<Sms> getSmsesBy(Date start, Date finish) {
+    public List<Sms> getSmsesByTime(Date start, Date finish) {
         return smsRepository.findAllBySendingTimeBetween(start, finish)
                 .stream().collect(Collectors.toList());
     }

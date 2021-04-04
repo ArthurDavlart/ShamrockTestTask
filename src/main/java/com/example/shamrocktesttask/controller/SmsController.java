@@ -5,13 +5,13 @@ import com.example.shamrocktesttask.dto.SmsDto;
 import com.example.shamrocktesttask.model.Sms;
 import com.example.shamrocktesttask.service.SmsService;
 import com.example.shamrocktesttask.utils.Convertor;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,9 +78,9 @@ public class SmsController {
                 .ok(smsDtoEntityModel);
     }
 
-    @GetMapping("/smses/getIds")
+    @GetMapping("/smses/getSmsesByIds")
     ResponseEntity<?> getSmsesByIds(@RequestBody List<Long> ids){
-        List<EntityModel<SmsDto>> entityModels = smsService.getSmsesBy(ids)
+        List<EntityModel<SmsDto>> entityModels = smsService.getSmsesByIds(ids)
                 .stream()
                 .map(sms -> toModel(convertor.convertToSmsDto(sms)))
                 .collect(Collectors.toList());
@@ -89,28 +89,28 @@ public class SmsController {
                 .ok(entityModels);
     }
 
-    @GetMapping("/smses/getByTag")
-    ResponseEntity<?> getSmses(@RequestBody Set<String> tags){
+    @GetMapping("/smses/getByTags")
+    ResponseEntity<?> getSmsesByTags(@RequestBody Set<String> tags){
         return ResponseEntity
-                .ok(smsService.getSmsesBy(tags)
+                .ok(smsService.getSmsesByTags(tags)
                 .stream()
                 .map(sms -> toModel(convertor.convertToSmsDto(sms)))
                 .collect(Collectors.toList()));
     }
 
     @GetMapping("/smses/getByPhone")
-    ResponseEntity<?> getSmses(@RequestBody String phone){
+    ResponseEntity<?> getSmsesByPhone(@RequestBody String phone){
         return ResponseEntity
-                .ok(smsService.getSmsesBy(phone)
+                .ok(smsService.getSmsesByPhone(phone)
                         .stream()
                         .map(sms -> toModel(convertor.convertToSmsDto(sms)))
                         .collect(Collectors.toList()));
     }
 
     @GetMapping("/smses/getByTime")
-    ResponseEntity<?> getSmses(@RequestBody IntervalDto intervalDto){ 
+    ResponseEntity<?> getSmsesByTime(@RequestBody IntervalDto intervalDto){
         return ResponseEntity
-                .ok(smsService.getSmsesBy(intervalDto.getStartDate(), intervalDto.getFinishDate())
+                .ok(smsService.getSmsesByTime(intervalDto.getStartDate(), intervalDto.getFinishDate())
                         .stream()
                         .map(sms -> toModel(convertor.convertToSmsDto(sms)))
                         .collect(Collectors.toList()));

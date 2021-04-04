@@ -10,9 +10,9 @@ import java.util.Set;
 public interface SmsService {
     Sms send(Sms sms);
     List<Sms> send(List<Sms> smses);
-    List<Sms> getSmsesBy(Date start, Date finish);
-    List<Sms> getSmsesBy(String phone);
-    List<Sms> getSmsesBy(Set<String> tags);
+    List<Sms> getSmsesByTime(Date start, Date finish);
+    List<Sms> getSmsesByPhone(String phone);
+    List<Sms> getSmsesByTags(Set<String> tags);
     Sms getSmsById(Long id);
-    List<Sms> getSmsesBy(List<Long> ids);
+    List<Sms> getSmsesByIds(List<Long> ids);
 }
