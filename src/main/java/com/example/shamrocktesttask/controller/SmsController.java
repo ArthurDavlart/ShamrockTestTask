@@ -26,12 +26,18 @@ public class SmsController {
     }
 
     @PostMapping("/sms")
-    SmsDto send(@RequestBody Sms sms){
+    SmsDto send(@RequestBody SmsDto smsDto){
+        Sms sms = convertor.convertToSms(smsDto);
         return convertor.convertToSmsDto(smsService.send(sms));
     }
 
     @PostMapping("/smses")
-    List<SmsDto> send(@RequestBody List<Sms> smses){
+    List<SmsDto> send(@RequestBody List<SmsDto> smsDtos){
+        List<Sms> smses = smsDtos
+                .stream()
+                .map(smsDto -> convertor.convertToSms(smsDto))
+                .collect(Collectors.toList());
+
         return smsService.send(smses)
                 .stream()
                 .map(sms -> convertor.convertToSmsDto(sms)).collect(Collectors.toList());
